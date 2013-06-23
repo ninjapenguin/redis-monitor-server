@@ -153,14 +153,14 @@ class CommandServer(Process):
                     redis_instance = self.determine_redis_instance(message)
                     message = self.clean_message(message)
 
-                    if redis_instance not in self.l_commands:
-                        self.l_commands[redis_instance] = []
-
                     # record all commands in stack
                     self.command_stack.append(message)
 
                     # record commands by instance
-                    self.l_commands[redis_instance].append(message)
+                    try:
+                        self.l_commands[redis_instance].append(message)
+                    except KeyError:
+                        self.l_commands[redis_instance] = [message]
         except KeyboardInterrupt:
             self.shutdown(True)
             return True
