@@ -95,6 +95,24 @@ class CommandServer(Process):
         self.l_commands = {}
         self.command_stack = []
 
+        self.commands = {
+            'register': self.register_emitter,
+            'last': self.get_last,
+            'last_by_instance': self.get_last_by_instance,
+            'all': self.list_all,
+            'all_by_instance': self.list_all_by_instance,
+            'reset': self.reset,
+            'shutdown': self.shutdown,
+            'commands_count': self.get_counts_by_instance,
+            'ping': self.ping
+        }
+
+    def register_command(self, command_string, command_callback):
+        self.commands[command_string] = command_callback
+
+    def ping(self):
+        return "pong"
+
     def run(self):
         context = zmq.Context()
 
@@ -168,36 +186,14 @@ class CommandServer(Process):
     def serve_command(self, command_raw):
 
         command_args = command_raw.strip().split(' ')
-        command = command_args[0]
+        command = command_args.pop(0)
 
-        if (command == 'register'):
-            return self.register_emitter(command_args[1])
-
-        if (command == 'last'):
-            return self.get_last()
-
-        if (command == 'last_by_instance'):
-            return self.get_last_by_instance(command_args[1])
-
-        if (command == 'all'):
-            return self.list_all()
-
-        if (command == 'all_by_instance'):
-            return self.list_all_by_instance(command_args[1])
-
-        if (command == 'reset'):
-            return self.reset()
-
-        if (command == 'shutdown'):
-            return self.shutdown()
-
-        if (command == 'commands_count'):
-            return self.get_counts_by_instance()
-
-        if (command == 'ping'):
-            return 'pong'
-
-        return "COMMAND_UNKNOWN"
+        try:
+            return self.commands[command](*command_args)
+        except KeyError:
+            return "COMMAND_UNKNOWN"
+        except Exception, e:
+            return "Error Occurred: {}".format(str(e))
 
     def register_emitter(self, redis_port):
 
@@ -318,6 +314,7 @@ class RedisMonitor(object):
         self.socket.send('reset')
         message = self.socket.recv()
         return True if message == 'True' else False
+
 
 if __name__ == '__main__':
 

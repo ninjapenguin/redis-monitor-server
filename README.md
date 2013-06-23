@@ -29,6 +29,8 @@ To install dependencies
 ### Option 1: Bootstrapping via python RedisMonitor class
 
 ```python
+from monitor import RedisMonitor
+
 rm = RedisMonitor(redis_ports=[6997,6998])
 
 # do a test
