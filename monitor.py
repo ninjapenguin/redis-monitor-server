@@ -116,13 +116,7 @@ class CommandServer(Process):
     def run(self):
         context = zmq.Context()
 
-        # attempt to listen on command interface
-        admin = context.socket(zmq.REP)
-        allready_running = False
-        try:
-            admin.bind("tcp://localhost:{}".format(self.admin_port))
-        except Exception:
-            allready_running = True
+        admin, allready_running = self.startup_admin_interface(context)
 
         self.startup_emitters()
 
@@ -139,6 +133,30 @@ class CommandServer(Process):
         poller.register(receiver, zmq.POLLIN)
 
         self.shutdown_flag = False
+
+        self.poll_for_updates(admin, receiver, poller)
+
+    def startup_admin_interface(self, context):
+        admin = context.socket(zmq.REP)
+        allready_running = False
+        try:
+            admin.bind("tcp://localhost:{}".format(self.admin_port))
+        except Exception:
+            allready_running = True
+
+        return (admin, allready_running)
+
+    def startup_emitters(self):
+        list_of_monitors = []
+
+        for r_port in self.redis_ports:
+            monitor_process = RedisEmitterProcess(redis_port=r_port)
+            monitor_process.start()
+            list_of_monitors.append(monitor_process)
+
+        self.started_emitters = list_of_monitors
+
+    def poll_for_updates(self, admin, receiver, poller):
         try:
             while self.shutdown_flag is False:
                 socks = dict(poller.poll())
@@ -149,32 +167,24 @@ class CommandServer(Process):
 
                 if receiver in socks and socks[receiver] == zmq.POLLIN:
                     message = receiver.recv()
+                    self.record_redis_command(message)
 
-                    redis_instance = self.determine_redis_instance(message)
-                    message = self.clean_message(message)
-
-                    # record all commands in stack
-                    self.command_stack.append(message)
-
-                    # record commands by instance
-                    try:
-                        self.l_commands[redis_instance].append(message)
-                    except KeyError:
-                        self.l_commands[redis_instance] = [message]
         except KeyboardInterrupt:
             self.shutdown(True)
             return True
 
-    def startup_emitters(self):
-        # start the emitters
-        list_of_monitors = []
+    def record_redis_command(self, command):
+        redis_instance = self.determine_redis_instance(command)
+        command = self.clean_message(command)
 
-        for r_port in self.redis_ports:
-            monitor_process = RedisEmitterProcess(redis_port=r_port)
-            monitor_process.start()
-            list_of_monitors.append(monitor_process)
+        # record all commands in stack
+        self.command_stack.append(command)
 
-        self.started_emitters = list_of_monitors
+        # record commands by instance
+        try:
+            self.l_commands[redis_instance].append(command)
+        except KeyError:
+            self.l_commands[redis_instance] = [command]
 
     def determine_redis_instance(self, message):
         return message[0:message.index(')')+1].strip('()')
@@ -183,7 +193,6 @@ class CommandServer(Process):
         return message[message.index(']')+1:].strip(' "').replace('" ', ' ').replace(' "', ' ')
 
     def serve_command(self, command_raw):
-
         command_args = command_raw.strip().split(' ')
         command = command_args.pop(0)
 
