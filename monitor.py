@@ -180,7 +180,6 @@ class CommandServer(Process):
         return message[0:message.index(')')+1].strip('()')
 
     def clean_message(self, message):
-
         return message[message.index(']')+1:].strip(' "').replace('" ', ' ').replace(' "', ' ')
 
     def serve_command(self, command_raw):
@@ -196,7 +195,6 @@ class CommandServer(Process):
             return "Error Occurred: {}".format(str(e))
 
     def register_emitter(self, redis_port):
-
         if redis_port in self.l_commands:
             return 'False'
         else:
@@ -204,7 +202,6 @@ class CommandServer(Process):
             return 'True'
 
     def get_last(self):
-
         if (len(self.command_stack) < 1):
             return ""
 
@@ -213,7 +210,6 @@ class CommandServer(Process):
         return last
 
     def get_last_by_instance(self, redis_port):
-
         if (redis_port not in self.l_commands or len(self.l_commands[redis_port]) < 1):
             return ""
 
@@ -225,7 +221,6 @@ class CommandServer(Process):
         return json.dumps(self.command_stack)
 
     def list_all_by_instance(self, redis_port):
-
         if (redis_port not in self.l_commands or len(self.l_commands[redis_port]) < 1):
             return ""
 
@@ -237,7 +232,6 @@ class CommandServer(Process):
         return 'True'
 
     def shutdown(self, exit=False):
-
         for mp in self.started_emitters:
             mp.terminate()
 
@@ -259,7 +253,6 @@ class RedisMonitor(object):
     """
 
     def __init__(self, redis_ports=[7171]):
-
         # start the command server
         command_server = CommandServer(redis_ports=redis_ports)
         command_server.start()
@@ -276,7 +269,6 @@ class RedisMonitor(object):
                 self.shutdown_admin_server = None
 
     def shutdown(self):
-
         if self.shutdown_admin_server:
             self.socket.send("shutdown")
             self.socket.recv()
