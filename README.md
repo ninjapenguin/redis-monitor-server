@@ -36,7 +36,9 @@ To start the redis monitoring server listening on two local ports:
 python monitor.py --redis_port 6997 6998
 ````
 
-You are then able to communicate with server using zmq REQ socket, using python for example:
+You are then able to communicate with server using zmq REQ socket directly:
+
+#### Python
 
 ```python
 import zmq
@@ -48,3 +50,12 @@ socket.send('last')
 response = socket.recv()
 # response == u'keys *'
 ````
+
+#### Lua
+
+require "zmq"
+local context = zmq.init(1)
+local socket = context:socket(zmq.REQ)
+socket:connect("tcp://localhost:5559")
+socket:send('last')
+local response = socket:recv()
