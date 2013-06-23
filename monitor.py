@@ -139,16 +139,16 @@ class CommandServer(Process):
 
     def startup_admin_interface(self, context):
         admin = context.socket(zmq.REP)
-        allready_running = False
+        already_running = False
         try:
             admin.bind("tcp://127.0.0.1:{}".format(self.admin_port))
         except ZMQError, e:
             if e.errno is not 48:
                 raise
 
-            allready_running = True
+            already_running = True
 
-        return (admin, allready_running)
+        return (admin, already_running)
 
     def startup_emitters(self):
         list_of_monitors = []
