@@ -145,7 +145,7 @@
 <div class="highlight"><pre><span class="nv">$context</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZMQContext</span><span class="p">();</span>
 
 <span class="nv">$socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZMQSocket</span><span class="p">(</span><span class="nv">$context</span><span class="p">,</span> <span class="nx">ZMQ</span><span class="o">::</span><span class="na">SOCKET_REQ</span><span class="p">);</span>
-<span class="nv">$socket</span><span class="o">-&gt;</span><span class="na">connect</span><span class="p">(</span><span class="s2">"tcp://localhost:5555"</span><span class="p">);</span>
+<span class="nv">$socket</span><span class="o">-&gt;</span><span class="na">connect</span><span class="p">(</span><span class="s2">"tcp://localhost:5559"</span><span class="p">);</span>
 <span class="nv">$socket</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s2">"last"</span><span class="p">);</span>
 <span class="nv">$response</span> <span class="o">=</span> <span class="nv">$socket</span><span class="o">-&gt;</span><span class="na">recv</span><span class="p">();</span>
 </pre></div>
