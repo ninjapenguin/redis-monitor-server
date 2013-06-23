@@ -2,7 +2,6 @@ import redis
 from multiprocessing import Process
 import argparse
 import zmq
-import time
 import json
 
 
@@ -276,15 +275,6 @@ class RedisMonitor(object):
 
         self.socket = context.socket(zmq.REQ)
         self.socket.connect("tcp://localhost:5559")
-
-    def poll(self, time_in_seconds=10):
-
-        for x in xrange(1, time_in_seconds):
-            self.socket.send("list")
-            message = self.socket.recv()
-            print message
-
-            time.sleep(1)
 
     def get_last_command(self):
         self.socket.send("last")
