@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Redis-monitor-server by ninjapenguin</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/ninjapenguin/redis-monitor-server">View On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/ninjapenguin/redis-monitor-server/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/ninjapenguin/redis-monitor-server/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Redis-monitor-server</h1>
+          <p>Redis Monitor Server</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/ninjapenguin">ninjapenguin</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></span>
+        </div>
+
+        <h1>
+<a name="redis-monitor-server" class="anchor" href="#redis-monitor-server"><span class="octicon octicon-link"></span></a>Redis Monitor Server</h1>
+
+<p>Redis Monior is a stand alone server written to monitor one or multiple redis servers. Its primary use is to allow you to automate the testing of applications that interface directly with <a href="http://www.redis.io">Redis</a></p>
+
+<h2>
+<a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a>Contents</h2>
+
+<ul>
+<li><a href="https://github.com/ninjapenguin/redis-monitor-server/#download">Download</a></li>
+<li><a href="https://github.com/ninjapenguin/redis-monitor-server/#installation">Installation</a></li>
+<li><a href="https://github.com/ninjapenguin/redis-monitor-server/#quickstart">Quickstart</a></li>
+</ul><h2>
+<a name="download" class="anchor" href="#download"><span class="octicon octicon-link"></span></a>Download</h2>
+
+<p>Download one liner:</p>
+
+<div class="highlight"><pre>git clone https://github.com/ninjapenguin/redis-monitor-server.git
+</pre></div>
+
+<h2>
+<a name="installation" class="anchor" href="#installation"><span class="octicon octicon-link"></span></a>Installation</h2>
+
+<p>To install dependencies</p>
+
+<div class="highlight"><pre> pip install -r requirements.txt
+</pre></div>
+
+<h2>
+<a name="quickstart" class="anchor" href="#quickstart"><span class="octicon octicon-link"></span></a>Quickstart</h2>
+
+<h3>
+<a name="option-1-bootstrapping-via-python-redismonitor-class" class="anchor" href="#option-1-bootstrapping-via-python-redismonitor-class"><span class="octicon octicon-link"></span></a>Option 1: Bootstrapping via python RedisMonitor class</h3>
+
+<div class="highlight"><pre><span class="kn">from</span> <span class="nn">monitor</span> <span class="kn">import</span> <span class="n">RedisMonitor</span>
+
+<span class="n">rm</span> <span class="o">=</span> <span class="n">RedisMonitor</span><span class="p">(</span><span class="n">redis_ports</span><span class="o">=</span><span class="p">[</span><span class="mi">6997</span><span class="p">,</span><span class="mi">6998</span><span class="p">])</span>
+
+<span class="c"># do a test</span>
+<span class="n">rm</span><span class="o">.</span><span class="n">get_last_command</span><span class="p">()</span>   <span class="c"># returns the last command run accross all instances</span>
+<span class="n">rm</span><span class="o">.</span><span class="n">get_last_command_by_instance</span><span class="p">(</span><span class="mi">6997</span><span class="p">)</span>   <span class="c"># returns the last command run on instance @ port 6997</span>
+<span class="n">rm</span><span class="o">.</span><span class="n">get_all_commands</span><span class="p">()</span>   <span class="c"># returns all commands run to date</span>
+<span class="n">rm</span><span class="o">.</span><span class="n">get_command_counts</span>   <span class="c"># returns a dict of port =&gt; number of commands recorded</span>
+
+<span class="n">rm</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>  <span class="c"># reset the current lists..</span>
+
+<span class="c"># do another test...</span>
+
+<span class="n">rm</span><span class="o">.</span><span class="n">shutdown</span><span class="p">()</span>
+</pre></div>
+
+<h3>
+<a name="option-2-run-the-server-manually-and-connect-externally" class="anchor" href="#option-2-run-the-server-manually-and-connect-externally"><span class="octicon octicon-link"></span></a>Option 2: Run the server manually and connect externally</h3>
+
+<p>To start the redis monitoring server listening on two local ports:</p>
+
+<div class="highlight"><pre>python monitor.py --redis_port 6997 6998
+</pre></div>
+
+<p>You are then able to communicate with server using zmq REQ socket directly:</p>
+
+<h4>
+<a name="python" class="anchor" href="#python"><span class="octicon octicon-link"></span></a>Python</h4>
+
+<div class="highlight"><pre><span class="kn">import</span> <span class="nn">zmq</span>
+<span class="n">context</span> <span class="o">=</span> <span class="n">zmq</span><span class="o">.</span><span class="n">Context</span><span class="p">()</span>
+
+<span class="n">socket</span> <span class="o">=</span> <span class="n">context</span><span class="o">.</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="o">.</span><span class="n">REQ</span><span class="p">)</span>
+<span class="n">socket</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="s">"tcp://localhost:5559"</span><span class="p">)</span>
+<span class="n">socket</span><span class="o">.</span><span class="n">send</span><span class="p">(</span><span class="s">'last'</span><span class="p">)</span>
+<span class="n">response</span> <span class="o">=</span> <span class="n">socket</span><span class="o">.</span><span class="n">recv</span><span class="p">()</span>
+<span class="c"># response == u'keys *'</span>
+</pre></div>
+
+<h4>
+<a name="lua" class="anchor" href="#lua"><span class="octicon octicon-link"></span></a>Lua</h4>
+
+<div class="highlight"><pre><span class="nb">require</span> <span class="s2">"</span><span class="s">zmq"</span>
+<span class="kd">local</span> <span class="n">context</span> <span class="o">=</span> <span class="n">zmq</span><span class="p">.</span><span class="n">init</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="kd">local</span> <span class="n">socket</span> <span class="o">=</span> <span class="n">context</span><span class="p">:</span><span class="n">socket</span><span class="p">(</span><span class="n">zmq</span><span class="p">.</span><span class="n">REQ</span><span class="p">)</span>
+<span class="n">socket</span><span class="p">:</span><span class="n">connect</span><span class="p">(</span><span class="s2">"</span><span class="s">tcp://localhost:5559"</span><span class="p">)</span>
+<span class="n">socket</span><span class="p">:</span><span class="n">send</span><span class="p">(</span><span class="s1">'</span><span class="s">last'</span><span class="p">)</span>
+<span class="kd">local</span> <span class="n">response</span> <span class="o">=</span> <span class="n">socket</span><span class="p">:</span><span class="n">recv</span><span class="p">()</span>
+</pre></div>
+
+<h4>
+<a name="php" class="anchor" href="#php"><span class="octicon octicon-link"></span></a>PHP</h4>
+
+<div class="highlight"><pre><span class="nv">$context</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZMQContext</span><span class="p">();</span>
+
+<span class="nv">$socket</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">ZMQSocket</span><span class="p">(</span><span class="nv">$context</span><span class="p">,</span> <span class="nx">ZMQ</span><span class="o">::</span><span class="na">SOCKET_REQ</span><span class="p">);</span>
+<span class="nv">$socket</span><span class="o">-&gt;</span><span class="na">connect</span><span class="p">(</span><span class="s2">"tcp://localhost:5555"</span><span class="p">);</span>
+<span class="nv">$socket</span><span class="o">-&gt;</span><span class="na">send</span><span class="p">(</span><span class="s2">"last"</span><span class="p">);</span>
+<span class="nv">$response</span> <span class="o">=</span> <span class="nv">$socket</span><span class="o">-&gt;</span><span class="na">recv</span><span class="p">();</span>
+</pre></div>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
