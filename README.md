@@ -10,9 +10,7 @@ Redis Monior is a stand alone server written to monitor one or multiple redis se
 
 ## Download
 
-You can download Redis Monitor via:
-
-### Bash
+Download one liner:
 
 ```bash
 git clone https://github.com/ninjapenguin/redis-monitor-server.git
