@@ -28,7 +28,7 @@ To install dependencies
 
 ## Quickstart
 
-### Option 1: bootstrapping via python RedisMonitor class
+### Option 1: Bootstrapping via python RedisMonitor class
 
 ```python
 rm = RedisMonitor(redis_ports=[6997,6998])
@@ -45,7 +45,7 @@ rm.reset()	# reset the current lists..
 rm.shutdown()
 ````
 
-### Option 2: starting the server manually and connecting to it from your favorite language
+### Option 2: Run the server manually and connect externally
 
 To start the redis monitoring server listening on two local ports:
 
