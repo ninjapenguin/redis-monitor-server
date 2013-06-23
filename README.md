@@ -53,9 +53,11 @@ response = socket.recv()
 
 #### Lua
 
+```lua
 require "zmq"
 local context = zmq.init(1)
 local socket = context:socket(zmq.REQ)
 socket:connect("tcp://localhost:5559")
 socket:send('last')
 local response = socket:recv()
+````
