@@ -101,7 +101,7 @@ local response = socket:recv()
 $context = new ZMQContext();
 
 $socket = new ZMQSocket($context, ZMQ::SOCKET_REQ);
-$socket->connect("tcp://localhost:5555");
+$socket->connect("tcp://localhost:5559");
 $socket->send("last");
 $response = $socket->recv();
 ````
