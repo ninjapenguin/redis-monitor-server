@@ -5,6 +5,7 @@ Redis Monior is a stand alone server written to monitor one or multiple redis se
 
 ## Contents
  * [Download] (https://github.com/ninjapenguin/redis-monitor-server/#download)
+ * [Installation] (https://github.com/ninjapenguin/redis-monitor-server/#installation)
 
 ## Download
 
@@ -15,3 +16,11 @@ You can download Redis Monitor via:
 ```bash
 git clone https://github.com/ninjapenguin/redis-monitor-server.git
 ````
+
+##Installation
+
+To install dependencies
+
+ ```bash
+ pip install -r < requirements.txt
+ ````
