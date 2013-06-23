@@ -21,7 +21,7 @@ git clone https://github.com/ninjapenguin/redis-monitor-server.git
 To install dependencies
 
  ```bash
- pip install -r < requirements.txt
+ pip install -r requirements.txt
  ````
 
 ## Quickstart

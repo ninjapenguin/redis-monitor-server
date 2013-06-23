@@ -182,25 +182,22 @@ class CommandServer(Process):
         if (command == 'all'):
             return self.list_all()
 
+        if (command == 'all_by_instance'):
+            return self.list_all_by_instance(command_args[1])
+
         if (command == 'reset'):
             return self.reset()
-
-        if (command == 'ping'):
-            return 'pong'
 
         if (command == 'shutdown'):
             return self.shutdown()
 
+        if (command == 'commands_count'):
+            return self.get_counts_by_instance()
+
+        if (command == 'ping'):
+            return 'pong'
+
         return "COMMAND_UNKNOWN"
-
-    def shutdown(self, exit=False):
-
-        for mp in self.started_emitters:
-            mp.terminate()
-
-        self.shutdown_flag = True
-
-        return "True"
 
     def register_emitter(self, redis_port):
 
@@ -209,14 +206,6 @@ class CommandServer(Process):
         else:
             self.l_commands[redis_port] = []
             return 'True'
-
-    def list_all(self):
-        return json.dumps(self.command_stack)
-
-    def reset(self):
-        self.command_stack = []
-        self.l_commands = []
-        return 'True'
 
     def get_last(self):
 
@@ -227,22 +216,44 @@ class CommandServer(Process):
         self.command_stack.append(last)
         return last
 
-    def get_last_by_instance(self, port):
+    def get_last_by_instance(self, redis_port):
 
-        if (port not in self.l_commands):
+        if (redis_port not in self.l_commands or len(self.l_commands[redis_port]) < 1):
             return ""
 
-        if (len(self.l_commands[port]) < 1):
-            return ""
-
-        last = self.l_commands[port].pop()
-        self.l_commands[port].append(last)
+        last = self.l_commands[redis_port].pop()
+        self.l_commands[redis_port].append(last)
         return last
 
+    def list_all(self):
+        return json.dumps(self.command_stack)
+
+    def list_all_by_instance(self, redis_port):
+
+        if (redis_port not in self.l_commands or len(self.l_commands[redis_port]) < 1):
+            return ""
+
+        return json.dumps(self.l_commands[redis_port])
+
+    def reset(self):
+        self.command_stack = []
+        self.l_commands = []
+        return 'True'
+
+    def shutdown(self, exit=False):
+
+        for mp in self.started_emitters:
+            mp.terminate()
+
+        self.shutdown_flag = True
+
+        return "True"
+
     def get_counts_by_instance(self):
-        sums = []
+        sums = {}
         for k, v in self.l_commands.items():
             sums[k] = len(v)
+
         return json.dumps(sums)
 
 
@@ -295,6 +306,11 @@ class RedisMonitor(object):
 
     def get_all_commands(self):
         self.socket.send("all")
+        message = self.socket.recv()
+        return json.loads(message)
+
+    def get_command_counts(self):
+        self.socket.send("commands_count")
         message = self.socket.recv()
         return json.loads(message)
 
