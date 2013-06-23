@@ -2,6 +2,7 @@ import redis
 from multiprocessing import Process
 import argparse
 import zmq
+from zmq.error import ZMQError
 import json
 
 
@@ -125,7 +126,7 @@ class CommandServer(Process):
 
         # Listen to redis emitters
         receiver = context.socket(zmq.PULL)
-        receiver.bind("tcp://localhost:{}".format(self.emit_in_port))
+        receiver.bind("tcp://127.0.0.1:{}".format(self.emit_in_port))
 
         # Initialize poll set
         poller = zmq.Poller()
@@ -140,8 +141,11 @@ class CommandServer(Process):
         admin = context.socket(zmq.REP)
         allready_running = False
         try:
-            admin.bind("tcp://localhost:{}".format(self.admin_port))
-        except Exception:
+            admin.bind("tcp://127.0.0.1:{}".format(self.admin_port))
+        except ZMQError, e:
+            if e.errno is not 48:
+                raise
+
             allready_running = True
 
         return (admin, allready_running)
