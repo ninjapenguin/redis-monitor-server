@@ -100,12 +100,16 @@ class CommandServer(Process):
 
         # attempt to listen on command interface
         admin = context.socket(zmq.REP)
+        allready_running = False
         try:
             admin.bind("tcp://*:{}".format(self.admin_port))
         except Exception:
-            return False
+            allready_running = True
 
         self.startup_emitters()
+
+        if allready_running:
+            return False
 
         # Listen to redis emitters
         receiver = context.socket(zmq.PULL)
@@ -116,8 +120,9 @@ class CommandServer(Process):
         poller.register(admin, zmq.POLLIN)
         poller.register(receiver, zmq.POLLIN)
 
+        self.shutdown_flag = False
         try:
-            while True:
+            while self.shutdown_flag is False:
                 socks = dict(poller.poll())
 
                 if admin in socks and socks[admin] == zmq.POLLIN:
@@ -192,6 +197,8 @@ class CommandServer(Process):
 
         for mp in self.started_emitters:
             mp.terminate()
+
+        self.shutdown_flag = True
 
         return "True"
 
