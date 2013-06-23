@@ -74,8 +74,19 @@ response = socket.recv()
 ```lua
 require "zmq"
 local context = zmq.init(1)
+
 local socket = context:socket(zmq.REQ)
 socket:connect("tcp://localhost:5559")
 socket:send('last')
 local response = socket:recv()
+````
+
+#### PHP
+```php
+$context = new ZMQContext();
+
+$socket = new ZMQSocket($context, ZMQ::SOCKET_REQ);
+$socket->connect("tcp://localhost:5555");
+$socket->send("last");
+$response = $socket->recv();
 ````
