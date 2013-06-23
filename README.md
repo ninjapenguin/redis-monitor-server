@@ -3,6 +3,21 @@ Redis Monitor Server
 
 Redis Monior is a stand alone server written to monitor one or multiple redis servers. Its primary use is to allow you to automate the testing of applications that interface directly with [Redis](http://www.redis.io)
 
+## TL;DR;
+
+```python
+from monitor import RedisMonitor
+
+rm = RedisMonitor(redis_ports=[6370])
+
+# execute your code..
+
+rm.get_last_command()	# return the last command run against the redis server
+rm.get_all_commands()	# return all commands run against the redis server
+rm.reset()				# reset the command history
+...
+```
+
 ## Contents
  * [Download] (https://github.com/ninjapenguin/redis-monitor-server/#download)
  * [Installation] (https://github.com/ninjapenguin/redis-monitor-server/#installation)
@@ -37,7 +52,7 @@ rm = RedisMonitor(redis_ports=[6997,6998])
 rm.get_last_command()	# returns the last command run accross all instances
 rm.get_last_command_by_instance(6997)	# returns the last command run on instance @ port 6997
 rm.get_all_commands()	# returns all commands run to date
-rm.get_command_counts	# returns a dict of port => number of commands recorded
+rm.get_command_counts()	# returns a dict of port => number of commands recorded
 
 rm.reset()	# reset the current lists..
 
