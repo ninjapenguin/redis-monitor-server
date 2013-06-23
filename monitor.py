@@ -120,7 +120,7 @@ class CommandServer(Process):
         admin = context.socket(zmq.REP)
         allready_running = False
         try:
-            admin.bind("tcp://*:{}".format(self.admin_port))
+            admin.bind("tcp://localhost:{}".format(self.admin_port))
         except Exception:
             allready_running = True
 
@@ -131,7 +131,7 @@ class CommandServer(Process):
 
         # Listen to redis emitters
         receiver = context.socket(zmq.PULL)
-        receiver.bind("tcp://*:{}".format(self.emit_in_port))
+        receiver.bind("tcp://localhost:{}".format(self.emit_in_port))
 
         # Initialize poll set
         poller = zmq.Poller()
