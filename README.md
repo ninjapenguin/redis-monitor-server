@@ -35,6 +35,7 @@ rm = RedisMonitor(redis_ports=[6997,6998])
 rm.get_last_command()	# returns the last command run accross all instances
 rm.get_last_command_by_instance(6997)	# returns the last command run on instance @ port 6997
 rm.get_all_commands()	# returns all commands run to date
+rm.get_command_counts	# returns a dict of port => number of commands recorded
 
 rm.reset()	# reset the current lists..
 
