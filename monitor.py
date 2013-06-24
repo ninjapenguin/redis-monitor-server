@@ -241,7 +241,7 @@ class CommandServer(Process):
 
     def reset(self):
         self.command_stack = []
-        self.l_commands = []
+        self.l_commands = {}
         return 'True'
 
     def shutdown(self, exit=False):
